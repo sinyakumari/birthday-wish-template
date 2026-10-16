@@ -13,7 +13,7 @@
 <body>
 
   <!-- Audio Element -->
-  <audio id="bg-music" src="audio/song.mp3" preload="auto" loop></audio>
+ <audio id="bg-music" src="audio/song.mp3" preload="auto" loop></audio>
 
   <!-- Page 1: Main Photo Screen -->
   <div id="page1" class="page active" aria-label="Welcome screen">
@@ -604,6 +604,9 @@
       <button type="button" id="gift-replay" class="gift-replay" aria-label="Replay">Replay</button>
     </div>
 
+    <!-- EDIT HERE: the bottom-right goodbye text -->
+    <p class="bye-note" aria-label="Okay bye">okay bye <span class="bye-heart">❤️</span></p>
+
     <!-- Round Left Arrow (back to Page 6). No right arrow: this is the last page. -->
     <button
       type="button"
@@ -619,14 +622,8 @@
   </section>
 
   <!-- Floating Play/Pause Music Control (Fixed bottom-right, visible above all pages) -->
-  <button 
-    type="button" 
-    id="music-toggle" 
-    class="music-fab" 
-    aria-label="Pause background music" 
-    title="Pause music"
-  >
-    <span class="music-icon" aria-hidden="true">⏸</span>
+  <button type="button" id="music-toggle" class="music-fab" aria-label="Play background music" title="Play music">
+    <span class="music-icon" aria-hidden="true">▶</span>
   </button>
 
   <script src="js/script.js"></script>

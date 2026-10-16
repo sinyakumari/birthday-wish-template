@@ -2081,3 +2081,36 @@ body {
   .gift-char-anim.tap { animation: none; }
   .p7-heart, .p7-confetti, .p7-spark, .p7-pop { display: none; }
 }
+
+/* ==================================================================
+   PAGE 7: "okay bye ❤️" (bottom right)
+   ================================================================== */
+.bye-note {
+  position: absolute;
+  bottom: 30px;
+  right: 90px;              /* leaves room for the music button */
+  margin: 0;
+  z-index: 5;
+  font-family: "Caveat", cursive;
+  font-weight: 700;
+  font-size: clamp(1.4rem, 4.5vw, 2rem);
+  line-height: 1;
+  color: var(--gold);
+  pointer-events: none;
+  user-select: none;
+}
+.bye-heart {
+  display: inline-block;
+  animation: bye-beat 1.4s ease-in-out infinite;
+}
+@keyframes bye-beat {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.25); }
+}
+
+@media (max-width: 700px) {
+  .bye-note { bottom: 34px; right: 80px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bye-heart { animation: none; }
+}
