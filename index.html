@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Birthday Wish</title>
+  <!-- Google Fonts: Great Vibes, Dancing Script & Caveat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Dancing+Script:wght@400..700&family=Great+Vibes&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Audio Element -->
+  <audio id="bg-music" src="audio/song.mp3" preload="auto" loop></audio>
+
+  <!-- Page 1: Main Photo Screen -->
+  <div id="page1" class="page active" aria-label="Welcome screen">
+    <div id="hearts-layer" aria-hidden="true"></div>
+    <div class="photo-frame">
+      <img 
+        src="images/main-screen-photo.jpeg" 
+        alt="Birthday memory" 
+        class="main-photo"
+      >
+      <button 
+        type="button" 
+        id="dot-button" 
+        class="dot-hotspot" 
+        aria-label="Play song and reveal surprise"
+      ></button>
+    </div>
+  </div>
+
+  <!-- Page 2: Birthday Celebration Screen -->
+  <section id="page-2" class="page hidden" aria-label="Birthday celebration screen" aria-hidden="true">
+    <!-- Floating Hearts Layer for Page 2 (rises behind everything, capped at 60) -->
+    <div id="hearts-layer-page2" class="hearts-layer" aria-hidden="true"></div>
+
+    <!-- Confetti Layer (for top celebration burst & sticker taps) -->
+    <div id="confetti-layer" class="confetti-layer" aria-hidden="true"></div>
+
+    <!-- Interactive Emoji Stickers Layer (z-index above hearts & card edges) -->
+    <!-- EDIT HERE: To change sticker emojis in HTML, edit the emoji text inside the buttons below.
+         (You can also edit STICKER_EMOJIS in js/script.js) -->
+    <div class="stickers-layer" id="stickers-layer" aria-label="Interactive birthday stickers">
+      <button type="button" class="sticker sticker-1" data-index="0" aria-label="Birthday cake sticker">🎂</button>
+      <button type="button" class="sticker sticker-2" data-index="1" aria-label="Balloon sticker">🎈</button>
+      <button type="button" class="sticker sticker-3" data-index="2" aria-label="Gift sticker">🎁</button>
+      <button type="button" class="sticker sticker-4" data-index="3" aria-label="Party popper sticker">🎉</button>
+      <button type="button" class="sticker sticker-5" data-index="4" aria-label="Partying face sticker">🥳</button>
+      <button type="button" class="sticker sticker-6" data-index="5" aria-label="Cupcake sticker">🧁</button>
+      <button type="button" class="sticker sticker-7" data-index="6" aria-label="Sparkles sticker">✨</button>
+      <button type="button" class="sticker sticker-8" data-index="7" aria-label="Confetti ball sticker">🎊</button>
+    </div>
+
+    <!-- Centered Glass Wish Card -->
+    <main class="wish-card" id="wish-card">
+      <!-- Heading Slot: Ghost text reserves full height so card never jumps -->
+      <div class="text-slot heading-slot">
+        <div class="text-ghost heading-ghost" id="heading-ghost" aria-hidden="true">Happy Birthday, BB! 🎉</div>
+        <h1 class="text-visible wish-heading" id="wish-heading">
+          <span id="wish-heading-text"></span>
+        </h1>
+      </div>
+
+      <!-- Wish Body Slot: Ghost text reserves exact paragraph height -->
+      <div class="text-slot body-slot">
+        <div class="text-ghost body-ghost" id="body-ghost" aria-hidden="true">Happy Birthday BB 🥳🎂 May you get everything you ever desire for. God bless you with lots of success and happiness ✨🎈</div>
+        <p class="text-visible wish-body" id="wish-body">
+          <span id="wish-body-text"></span>
+        </p>
+      </div>
+
+      <!-- Sign-off Slot: Ghost text reserves sign-off height -->
+      <div class="text-slot sign-slot">
+        <div class="text-ghost sign-ghost" id="sign-ghost" aria-hidden="true">Yours truly, Pree</div>
+        <p class="text-visible wish-sign" id="wish-sign">
+          <span id="wish-sign-text"></span>
+        </p>
+      </div>
+    </main>
+
+    <!-- Round Next-Page Arrow on Page 2 (Right side, pulses when writing completes) -->
+    <button 
+      type="button" 
+      id="next-page-2" 
+      class="page-nav-btn nav-next hidden" 
+      aria-label="Next page" 
+      title="Next page"
+    >
+      <svg viewBox="0 0 24 24" class="nav-chevron" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+  </section>
+
+  <!-- Page 3: Bouquet of Heart Reasons Screen -->
+  <section id="page-3" class="page hidden" aria-label="Bouquet of Reasons screen" aria-hidden="true">
+    <!-- Floating Hearts Layer for Page 3 (rises behind everything, capped at 60) -->
+    <div id="hearts-layer-page3" class="hearts-layer" aria-hidden="true"></div>
+
+    <!-- Confetti Layer for Page 3 (triggers when all reasons are opened) -->
+    <div id="confetti-layer-page3" class="confetti-layer" aria-hidden="true"></div>
+
+    <!-- Round Back Arrow on Page 3 (Left side, returns to Page 2) -->
+    <button 
+      type="button" 
+      id="prev-page-3" 
+      class="page-nav-btn nav-prev" 
+      aria-label="Previous page" 
+      title="Previous page"
+    >
+      <svg viewBox="0 0 24 24" class="nav-chevron" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+
+    <!-- Round Next-Page Arrow on Page 3 (Right side, goes to Page 4) -->
+    <button 
+      type="button" 
+      id="next-page-3" 
+      class="page-nav-btn nav-next pulse" 
+      aria-label="Next page" 
+      title="Next page"
+    >
+      <svg viewBox="0 0 24 24" class="nav-chevron" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+
+    <!-- Page 3 Main Content: Header & Bouquet -->
+    <div class="page-3-content">
+      <header class="bouquet-header">
+        <!-- EDIT HERE: Change title in index.html and in BOUQUET_TITLE constant in js/script.js -->
+        <h1 class="bouquet-title" id="bouquet-title">BB, tap a heart</h1>
+      </header>
+
+      <div class="bouquet-stage">
+        <!-- Single Scalable Inline SVG Bouquet (viewBox 0 0 400 620) -->
+        <svg 
+          viewBox="0 0 400 620" 
+          preserveAspectRatio="xMidYMid meet" 
+          class="bouquet-svg" 
+          id="bouquet-svg"
+          aria-label="Paper craft bouquet with heart reasons"
+        >
+          <!-- STEMS: Generated dynamically in js/script.js to always match heart positions exactly -->
+          <g class="bouquet-stems" id="bouquet-stems"></g>
+
+          <!-- LEAVES: along stems & cone rim -->
+          <g class="bouquet-leaves" id="bouquet-leaves">
+            <path d="M 95 235 Q 55 225 40 245 Q 75 255 95 235 Z" fill="var(--leaf-green)"></path>
+            <path d="M 155 275 Q 115 270 105 290 Q 135 300 155 275 Z" fill="var(--leaf-green)"></path>
+            <path d="M 195 280 Q 185 245 200 240 Q 215 255 205 280 Z" fill="var(--leaf-green)"></path>
+            <path d="M 245 275 Q 285 270 295 290 Q 265 300 245 275 Z" fill="var(--leaf-green)"></path>
+            <path d="M 305 235 Q 345 225 360 245 Q 325 255 305 235 Z" fill="var(--leaf-green)"></path>
+            <path d="M 125 185 Q 90 175 80 195 Q 110 205 125 185 Z" fill="var(--leaf-green)"></path>
+          </g>
+
+          <!-- HEARTS: Built as two nested groups (.heart-pos and .heart-anim)
+               - Outer .heart-pos holds SVG transform (position & tilt); never animated in CSS
+               - Inner .heart-anim holds all CSS animations (sway, hover, pop) with fill-box center
+               - Numbers removed: plain pink hearts with red edge; checkmark shows when opened -->
+          <g class="bouquet-hearts" id="bouquet-hearts">
+            <!-- Heart 1: (95, 150), tilt -18deg -->
+            <g class="heart-pos" id="heart-pos-1" transform="translate(95 150) rotate(-18)">
+              <g class="heart-anim" id="heart-anim-1" data-index="0" role="button" tabindex="0" aria-label="Open reason 1">
+                <circle r="42" fill="transparent" pointer-events="all"></circle>
+                <path class="heart-edge" d="M 0 31 C -40 5 -46 -24 -22 -37 C -9 -43 0 -24 0 -24 C 0 -24 9 -43 22 -37 C 46 -24 40 5 0 31 Z" fill="var(--heart-edge)"></path>
+                <path class="heart-inner" d="M 0 26 C -33 5 -38 -20 -18 -31 C -7 -37 0 -20 0 -20 C 0 -20 7 -37 18 -31 C 38 -20 33 5 0 26 Z" fill="var(--heart-pink)"></path>
+                <text class="heart-check" y="4" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="bold" fill="var(--stem-green)">✓</text>
+              </g>
+            </g>
+
+            <!-- Heart 2: (200, 85), tilt -4deg -->
+            <g class="heart-pos" id="heart-pos-2" transform="translate(200 85) rotate(-4)">
+              <g class="heart-anim" id="heart-anim-2" data-index="1" role="button" tabindex="0" aria-label="Open reason 2">
+                <circle r="42" fill="transparent" pointer-events="all"></circle>
+                <path class="heart-edge" d="M 0 31 C -40 5 -46 -24 -22 -37 C -9 -43 0 -24 0 -24 C 0 -24 9 -43 22 -37 C 46 -24 40 5 0 31 Z" fill="var(--heart-edge)"></path>
+                <path class="heart-inner" d="M 0 26 C -33 5 -38 -20 -18 -31 C -7 -37 0 -20 0 -20 C 0 -20 7 -37 18 -31 C 38 -20 33 5 0 26 Z" fill="var(--heart-pink)"></path>
+                <text class="heart-check" y="4" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="bold" fill="var(--stem-green)">✓</text>
+              </g>
+            </g>
+
+            <!-- Heart 3: (305, 135), tilt 16deg -->
+            <g class="heart-pos" id="heart-pos-3" transform="translate(305 135) rotate(16)">
+              <g class="heart-anim" id="heart-anim-3" data-index="2" role="button" tabindex="0" aria-label="Open reason 3">
+                <circle r="42" fill="transparent" pointer-events="all"></circle>
+                <path class="heart-edge" d="M 0 31 C -40 5 -46 -24 -22 -37 C -9 -43 0 -24 0 -24 C 0 -24 9 -43 22 -37 C 46 -24 40 5 0 31 Z" fill="var(--heart-edge)"></path>
+                <path class="heart-inner" d="M 0 26 C -33 5 -38 -20 -18 -31 C -7 -37 0 -20 0 -20 C 0 -20 7 -37 18 -31 C 38 -20 33 5 0 26 Z" fill="var(--heart-pink)"></path>
+                <text class="heart-check" y="4" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="bold" fill="var(--stem-green)">✓</text>
+              </g>
+            </g>
+
+            <!-- Heart 4: (150, 235), tilt -8deg -->
+            <g class="heart-pos" id="heart-pos-4" transform="translate(150 235) rotate(-8)">
+              <g class="heart-anim" id="heart-anim-4" data-index="3" role="button" tabindex="0" aria-label="Open reason 4">
+                <circle r="42" fill="transparent" pointer-events="all"></circle>
+                <path class="heart-edge" d="M 0 31 C -40 5 -46 -24 -22 -37 C -9 -43 0 -24 0 -24 C 0 -24 9 -43 22 -37 C 46 -24 40 5 0 31 Z" fill="var(--heart-edge)"></path>
+                <path class="heart-inner" d="M 0 26 C -33 5 -38 -20 -18 -31 C -7 -37 0 -20 0 -20 C 0 -20 7 -37 18 -31 C 38 -20 33 5 0 26 Z" fill="var(--heart-pink)"></path>
+                <text class="heart-check" y="4" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="bold" fill="var(--stem-green)">✓</text>
+              </g>
+            </g>
+
+            <!-- Heart 5: (255, 230), tilt 8deg -->
+            <g class="heart-pos" id="heart-pos-5" transform="translate(255 230) rotate(8)">
+              <g class="heart-anim" id="heart-anim-5" data-index="4" role="button" tabindex="0" aria-label="Open reason 5">
+                <circle r="42" fill="transparent" pointer-events="all"></circle>
+                <path class="heart-edge" d="M 0 31 C -40 5 -46 -24 -22 -37 C -9 -43 0 -24 0 -24 C 0 -24 9 -43 22 -37 C 46 -24 40 5 0 31 Z" fill="var(--heart-edge)"></path>
+                <path class="heart-inner" d="M 0 26 C -33 5 -38 -20 -18 -31 C -7 -37 0 -20 0 -20 C 0 -20 7 -37 18 -31 C 38 -20 33 5 0 26 Z" fill="var(--heart-pink)"></path>
+                <text class="heart-check" y="4" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="bold" fill="var(--stem-green)">✓</text>
+              </g>
+            </g>
+
+            <!-- Heart 6: (60, 255), tilt -22deg -->
+            <g class="heart-pos" id="heart-pos-6" transform="translate(60 255) rotate(-22)">
+              <g class="heart-anim" id="heart-anim-6" data-index="5" role="button" tabindex="0" aria-label="Open reason 6">
+                <circle r="42" fill="transparent" pointer-events="all"></circle>
+                <path class="heart-edge" d="M 0 31 C -40 5 -46 -24 -22 -37 C -9 -43 0 -24 0 -24 C 0 -24 9 -43 22 -37 C 46 -24 40 5 0 31 Z" fill="var(--heart-edge)"></path>
+                <path class="heart-inner" d="M 0 26 C -33 5 -38 -20 -18 -31 C -7 -37 0 -20 0 -20 C 0 -20 7 -37 18 -31 C 38 -20 33 5 0 26 Z" fill="var(--heart-pink)"></path>
+                <text class="heart-check" y="4" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="bold" fill="var(--stem-green)">✓</text>
+              </g>
+            </g>
+
+            <!-- Heart 7: (340, 250), tilt 20deg -->
+            <g class="heart-pos" id="heart-pos-7" transform="translate(340 250) rotate(20)">
+              <g class="heart-anim" id="heart-anim-7" data-index="6" role="button" tabindex="0" aria-label="Open reason 7">
+                <circle r="42" fill="transparent" pointer-events="all"></circle>
+                <path class="heart-edge" d="M 0 31 C -40 5 -46 -24 -22 -37 C -9 -43 0 -24 0 -24 C 0 -24 9 -43 22 -37 C 46 -24 40 5 0 31 Z" fill="var(--heart-edge)"></path>
+                <path class="heart-inner" d="M 0 26 C -33 5 -38 -20 -18 -31 C -7 -37 0 -20 0 -20 C 0 -20 7 -37 18 -31 C 38 -20 33 5 0 26 Z" fill="var(--heart-pink)"></path>
+                <text class="heart-check" y="4" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="bold" fill="var(--stem-green)">✓</text>
+              </g>
+            </g>
+
+            <!-- Heart 8: (200, 165), tilt 0deg -->
+            <g class="heart-pos" id="heart-pos-8" transform="translate(200 165) rotate(0)">
+              <g class="heart-anim" id="heart-anim-8" data-index="7" role="button" tabindex="0" aria-label="Open reason 8">
+                <circle r="42" fill="transparent" pointer-events="all"></circle>
+                <path class="heart-edge" d="M 0 31 C -40 5 -46 -24 -22 -37 C -9 -43 0 -24 0 -24 C 0 -24 9 -43 22 -37 C 46 -24 40 5 0 31 Z" fill="var(--heart-edge)"></path>
+                <path class="heart-inner" d="M 0 26 C -33 5 -38 -20 -18 -31 C -7 -37 0 -20 0 -20 C 0 -20 7 -37 18 -31 C 38 -20 33 5 0 26 Z" fill="var(--heart-pink)"></path>
+                <text class="heart-check" y="4" text-anchor="middle" dominant-baseline="central" font-size="22" font-weight="bold" fill="var(--stem-green)">✓</text>
+              </g>
+            </g>
+          </g>
+
+          <!-- CONE WRAPPER (drawn over stems, rotated ~3 degrees for handmade papercraft feel) -->
+          <g class="bouquet-cone-group" transform="rotate(3, 200, 450)">
+            <!-- Cream paper cone body -->
+            <path 
+              d="M 42 298 Q 200 314 358 298 Q 285 450 205 608 Q 200 612 195 608 Q 115 450 42 298 Z" 
+              fill="var(--paper-cream)" 
+              stroke="color-mix(in srgb, var(--ink) 18%, transparent)" 
+              stroke-width="1.5"
+            ></path>
+            <!-- Soft inner shadow on left fold -->
+            <path 
+              d="M 42 298 Q 170 310 196 608 Q 115 450 42 298 Z" 
+              fill="color-mix(in srgb, var(--ink) 7%, transparent)"
+            ></path>
+
+            <!-- TWO THIN RED STRIPES NEAR CONE TOP -->
+            <path d="M 52 322 Q 200 338 348 322" stroke="var(--bow-red)" stroke-width="3" stroke-linecap="round" fill="none"></path>
+            <path d="M 64 362 Q 200 378 336 362" stroke="var(--bow-red)" stroke-width="3" stroke-linecap="round" fill="none"></path>
+
+            <!-- HANDWRITTEN LABEL ON CONE -->
+            <!-- EDIT HERE: Change label text below if desired -->
+            <text 
+              x="200" 
+              y="350" 
+              text-anchor="middle" 
+              font-family="'Caveat', cursive" 
+              font-weight="700" 
+              font-size="21" 
+              fill="var(--ink)"
+              letter-spacing="0.5"
+            >Everything I Like About You</text>
+          </g>
+
+          <!-- BIG RED PAPER BOW (near 200, 470) -->
+          <g class="bouquet-bow" transform="translate(0, 0)">
+            <!-- Left Ribbon Tail -->
+            <path d="M 194 476 Q 168 535 158 565 L 178 548 L 198 560 Q 198 515 196 480 Z" fill="var(--bow-red)" stroke="var(--bow-red-dark)" stroke-width="1"></path>
+            <!-- Right Ribbon Tail -->
+            <path d="M 206 476 Q 232 535 242 565 L 222 548 L 202 560 Q 202 515 204 480 Z" fill="var(--bow-red)" stroke="var(--bow-red-dark)" stroke-width="1"></path>
+
+            <!-- Left Loop Back Shadow -->
+            <path d="M 188 466 C 145 435 110 455 125 482 C 140 498 175 485 188 474 Z" fill="var(--bow-red-dark)"></path>
+            <!-- Left Loop Front -->
+            <path d="M 190 464 C 130 422 105 450 124 482 C 138 502 176 488 190 472 Z" fill="var(--bow-red)"></path>
+
+            <!-- Right Loop Back Shadow -->
+            <path d="M 212 466 C 255 435 290 455 275 482 C 260 498 225 485 212 474 Z" fill="var(--bow-red-dark)"></path>
+            <!-- Right Loop Front -->
+            <path d="M 210 464 C 270 422 295 450 276 482 C 262 502 224 488 210 472 Z" fill="var(--bow-red)"></path>
+
+            <!-- Bow Center Knot -->
+            <path d="M 188 460 Q 200 455 212 460 Q 215 476 211 484 Q 200 488 189 484 Q 185 476 188 460 Z" fill="var(--bow-red)" stroke="var(--bow-red-dark)" stroke-width="1.5"></path>
+          </g>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Reason Card Modal & Dim Overlay -->
+    <div id="reason-overlay" class="reason-overlay hidden" aria-hidden="true">
+      <div 
+        id="reason-card" 
+        class="reason-card" 
+        role="dialog" 
+        aria-modal="true" 
+        aria-labelledby="reason-card-title"
+      >
+        <div class="reason-card-header">
+          <span class="reason-heart-icon" aria-hidden="true">❤</span>
+          <h2 id="reason-card-title" class="reason-card-title">Reason 1</h2>
+        </div>
+        <p id="reason-card-text" class="reason-card-text"></p>
+        <button type="button" id="reason-card-close" class="reason-close-btn" aria-label="Close reason">
+          Close
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Page 4: Hanging Photo Wall -->
+  <section id="page-4" class="page hidden" aria-label="Photo wall screen" aria-hidden="true">
+    <!-- Floating Hearts Layer for Page 4 -->
+    <div id="hearts-layer-page4" class="hearts-layer" aria-hidden="true"></div>
+
+    <!-- Round Back Arrow on Page 4 (Left side, returns to Page 3) -->
+    <button 
+      type="button" 
+      id="prev-page-4" 
+      class="page-nav-btn nav-prev pulse" 
+      aria-label="Previous page" 
+      title="Previous page"
+    >
+      <svg viewBox="0 0 24 24" class="nav-chevron" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+
+    <!-- Page 4 content -->
+    <div class="page-4-content">
+      <!-- Title block: "Our Memories, BB" + subtitle "Tap a photo"
+           EDIT HERE: Change wall-title text to customize the heading -->
+      <header class="wall-header" id="wall-header">
+        <h1 class="wall-title" id="wall-title">25 Memories  Of  Us  on  your  25th  Birthday</h1>
+        <!-- EDIT HERE: Change subtitle text here -->
+        <p class="wall-subtitle">Tap a photo</p>
+      </header>
+
+      <!-- String & photo wall canvas — filled by JavaScript -->
+      <div class="wall-stage" id="wall-stage" aria-label="Hanging photo wall"></div>
+    </div>
+
+    <!-- Photo Viewer Overlay (opened when a photo is clicked) -->
+    <div id="photo-viewer-overlay" class="photo-viewer-overlay hidden" aria-hidden="true">
+      <div id="photo-viewer" class="photo-viewer" role="dialog" aria-modal="true" aria-label="Photo viewer">
+        <!-- Close button -->
+        <button type="button" id="photo-viewer-close" class="viewer-close-btn" aria-label="Close photo viewer">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+
+        <!-- Previous photo arrow -->
+        <button type="button" id="photo-viewer-prev" class="viewer-arrow viewer-arrow-prev" aria-label="Previous photo">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+        </button>
+
+        <!-- The big polaroid frame -->
+        <div class="viewer-polaroid" id="viewer-polaroid">
+          <div class="viewer-photo-wrap">
+            <img id="viewer-img" class="viewer-img" src="" alt="" loading="eager" decoding="async">
+          </div>
+          <p id="viewer-caption" class="viewer-caption"></p>
+        </div>
+
+        <!-- Next photo arrow -->
+        <button type="button" id="photo-viewer-next" class="viewer-arrow viewer-arrow-next" aria-label="Next photo">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
+
+        <!-- Counter "7 / 25" -->
+        <p id="viewer-counter" class="viewer-counter"></p>
+      </div>
+    </div>
+    <!-- Round Next-Page Arrow on Page 4 (Right side, goes to Page 5) -->
+    <button 
+      type="button" 
+      id="next-page-4" 
+      class="page-nav-btn nav-next pulse" 
+      aria-label="Next page" 
+      title="Next page"
+    >
+      <svg viewBox="0 0 24 24" class="nav-chevron" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+  </section>
+
+  <!-- Page 5: Vintage Parchment Wish Screen -->
+  <section id="page-5" class="page hidden" aria-label="Birthday wish letter screen" aria-hidden="true">
+    <!-- Floating Hearts Layer for Page 5 (behind paper, cap 60) -->
+    <div id="hearts-layer-page5" class="hearts-layer" aria-hidden="true"></div>
+
+    <!-- Confetti Layer for Page 5 (triggers when Page 5 appears) -->
+    <div id="confetti-layer-page5" class="confetti-layer" aria-hidden="true"></div>
+
+    <!-- Round Back Arrow on Page 5 (Left side, returns to Page 4) -->
+    <button 
+      type="button" 
+      id="prev-page-5" 
+      class="page-nav-btn nav-prev pulse" 
+      aria-label="Previous page" 
+      title="Previous page"
+    >
+      <svg viewBox="0 0 24 24" class="nav-chevron" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+
+    <!-- Round Right Arrow on Page 5 (goes to Page 6) -->
+    <button
+      type="button"
+      id="next-page-5"
+      class="page-nav-btn nav-next pulse"
+      aria-label="Next page"
+      title="Next page"
+    >
+      <svg viewBox="0 0 24 24" class="nav-chevron" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+
+    <!-- Parchment Paper Wrapper -->
+    <div class="paper-container">
+      <div class="paper" id="wish-paper" aria-label="Vintage parchment letter">
+        <div class="wish-text" id="wish-text" role="document" aria-label="Birthday letter text">
+          <!-- EDIT HERE: Heading for Page 5 wish letter -->
+          <h2 class="parchment-heading">Happy birthday Sahil❤️🎊</h2>
+
+          <!-- EDIT HERE: Paragraphs for Page 5 wish letter -->
+          <p class="parchment-para">Wishing you a day filled with most memorable moments and generous people around 💗May you get everything you ever wished for, may your hard work never gets wasted, may you always stay happy wherever you are💕Having a man like you as my best friend is not less than universe's precious gift❤️🧿you are so kind and calm towards me since beginning, and I never ever owe you anything in return of it🌸Thank you for bringing shine to my dark, thank you for bringing laughters at my worst days, thank you for being that human I never wanted to lose🫶🏻May life always stays kind to you the way you are with everyone💙May life never fades your smile. Another of you, another year of us being together with lots of argues, forgiveness, consolations, yet completing another year with you felt like most beautiful thing ever🥰❤️</p>
+          <p class="parchment-para">God bless you always🫠</p>
+          <p class="parchment-para">Enjoy your day🎊, once again,</p>
+          <p class="parchment-para">Happiest 25th, BB🌸❤️IMY:)</p>
+
+          <!-- EDIT HERE: Sign-off for Page 5 wish letter -->
+          <div class="parchment-sign">
+            <p class="parchment-sign-line">Yours truly,</p>
+            <p class="parchment-sign-line">Pree..</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Page 6: The Chit (Love Note) -->
+  <section id="page-6" class="page hidden" aria-label="Love note screen" aria-hidden="true">
+    <!-- Floating hearts behind everything -->
+    <div id="hearts-layer-page6" aria-hidden="true"></div>
+
+    <!-- The folded chit (closed state) -->
+    <!-- EDIT HERE: change "Click here" if you like -->
+    <button type="button" id="chit-closed" class="chit-closed" aria-label="Open the note">
+      <span class="chit-front">Click here <span class="hand-heart">&#10084;</span></span>
+    </button>
+
+    <!-- The opened note (hidden until the chit is clicked) -->
+    <div id="note-container" class="note-container hidden" aria-hidden="true">
+      <svg viewBox="0 0 520 380" class="love-note-svg" aria-label="Love note">
+        <!-- Paper (the torn edge is drawn by the JS) -->
+        <path class="note-paper" d="M5,5 L515,5 L515,375 L5,375 Z" fill="var(--kraft)"></path>
+
+        <!-- EDIT HERE: top text -->
+        <text class="note-top-text" x="260" y="72" text-anchor="middle" font-family="Caveat, cursive" font-weight="700" font-size="38" fill="var(--ink)">
+          I love you
+          <tspan fill="var(--accent)" font-size="24">&#10084;</tspan>
+        </text>
+
+        <!-- The girl (hand-drawn style). The hands are added by the JS -->
+        <g class="note-girl" stroke="var(--ink)" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="262" cy="165" r="24"></circle>
+          <path d="M242 160 C238 150 226 150 222 160"></path>
+          <path d="M282 160 C286 150 298 150 302 160"></path>
+          <circle cx="254" cy="165" r="2"></circle>
+          <circle cx="270" cy="165" r="2"></circle>
+          <path d="M250 180 Q262 190 274 180"></path>
+          <line x1="262" y1="189" x2="262" y2="262"></line>
+          <path d="M262 262 L222 318 L302 318 Z" fill="var(--dress-magenta)" stroke="var(--ink)" stroke-width="2"></path>
+          <line x1="242" y1="318" x2="242" y2="352"></line>
+          <line x1="282" y1="318" x2="282" y2="352"></line>
+          <path d="M242 352 h-6"></path>
+          <path d="M282 352 h6"></path>
+          <!-- Arms (stretched by the JS) -->
+          <line id="arm-line" x1="228" y1="218" x2="296" y2="218" stroke-width="4"></line>
+        </g>
+
+        <!-- EDIT HERE: left word (letters are added by the JS) -->
+        <text id="word-thi" x="36" y="322" font-family="Caveat, cursive" font-weight="700" font-size="30" fill="var(--ink)" text-anchor="start">this</text>
+
+        <!-- EDIT HERE: right word (appears when the arms are fully open) -->
+        <text id="word-much" x="330" y="348" font-family="Caveat, cursive" font-weight="700" font-size="30" fill="var(--ink)" text-anchor="start" opacity="0">much</text>
+      </svg>
+
+      <button type="button" id="replay-note" class="replay-note" aria-label="Replay">Replay</button>
+    </div>
+
+    <!-- Round Left Arrow (back to Page 5) -->
+    <button
+      type="button"
+      id="prev-page-6"
+      class="page-nav-btn nav-prev"
+      aria-label="Previous page"
+      title="Previous page"
+    >
+      <svg viewBox="0 0 24 24" class="nav-chevron" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+    <!-- Round Right Arrow on Page 6 (goes to Page 7) -->
+    <button
+      type="button"
+      id="next-page-6"
+      class="page-nav-btn nav-next pulse"
+      aria-label="Next page"
+      title="Next page"
+    >
+      <svg viewBox="0 0 24 24" class="nav-chevron" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"></polyline>
+      </svg>
+    </button>
+  </section>
+
+    <!-- Page 7: The Gift Box -->
+  <section id="page-7" class="page hidden" aria-label="Gift box screen" aria-hidden="true">
+    <!-- Floating hearts behind everything -->
+    <div id="hearts-layer-page7" aria-hidden="true"></div>
+    <!-- Confetti when the lid pops -->
+    <div id="confetti-layer-page7" aria-hidden="true"></div>
+
+    <div class="gift-wrap" id="gift-wrap">
+      <!-- EDIT HERE: the label above the box -->
+      <p class="gift-label" id="gift-label">
+        Open it
+        <svg viewBox="0 0 60 50" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 6 C 34 4 52 14 48 38"></path>
+          <path d="M38 30 L48 40 L56 28"></path>
+        </svg>
+      </p>
+
+      <!-- The gift box: back layer, character, front layer (lid is inside the front layer) -->
+      <button type="button" id="gift-stage" class="gift-stage" aria-label="Open the gift box">
+        <!-- Layer 1: back of the box -->
+        <svg class="gift-back" viewBox="0 0 400 460" aria-hidden="true">
+          <ellipse class="gift-shadow" cx="200" cy="438" rx="150" ry="13"></ellipse>
+          <rect class="g-inside" x="64" y="204" width="272" height="34" rx="6"></rect>
+          <rect class="g-inside-dark" x="64" y="204" width="272" height="12" rx="6"></rect>
+        </svg>
+
+        <!-- Layer 2: the surprise character (sits between the back and front layers) -->
+        <!-- EDIT HERE: change the image name if yours is different -->
+        <span class="gift-char-clip" aria-hidden="true">
+          <span class="gift-char-pos" id="gift-char-pos">
+            <span class="gift-char-anim" id="gift-char-anim">
+              <img class="gift-char-img" id="gift-char-img" src="images/gift-surprise.png" alt="Surprise" draggable="false">
+            </span>
+          </span>
+        </span>
+
+        <!-- Layer 3: front of the box + the lid with the bow -->
+        <svg class="gift-front" viewBox="0 0 400 460" aria-hidden="true">
+          <rect class="g-rim" x="56" y="220" width="288" height="14" rx="7"></rect>
+          <rect class="g-body" x="60" y="228" width="280" height="192" rx="10"></rect>
+          <rect class="g-shade" x="60" y="228" width="30" height="192" rx="10"></rect>
+          <rect class="g-ribbon" x="186" y="228" width="28" height="192"></rect>
+
+          <g class="gift-lid">
+            <rect class="g-lid" x="46" y="176" width="308" height="52" rx="9"></rect>
+            <rect class="g-lid-shine" x="46" y="176" width="308" height="10" rx="5"></rect>
+            <rect class="g-ribbon" x="186" y="176" width="28" height="52"></rect>
+            <!-- bow -->
+            <path class="g-bow-dark" d="M200 176 C 150 118 104 140 134 176 C 154 192 190 184 200 178 Z"></path>
+            <path class="g-bow-dark" d="M200 176 C 250 118 296 140 266 176 C 246 192 210 184 200 178 Z"></path>
+            <path class="g-bow" d="M200 174 C 156 128 120 146 142 172 C 158 186 188 180 200 176 Z"></path>
+            <path class="g-bow" d="M200 174 C 244 128 280 146 258 172 C 242 186 212 180 200 176 Z"></path>
+            <path class="g-bow-dark" d="M194 184 L170 216 L190 210 L200 190 Z"></path>
+            <path class="g-bow-dark" d="M206 184 L230 216 L210 210 L200 190 Z"></path>
+            <ellipse class="g-bow" cx="200" cy="176" rx="15" ry="12"></ellipse>
+          </g>
+        </svg>
+      </button>
+
+      <!-- The caption text is set in js (SURPRISE_CAPTION) -->
+      <p class="gift-caption" id="gift-caption" aria-live="polite"></p>
+      <button type="button" id="gift-replay" class="gift-replay" aria-label="Replay">Replay</button>
+    </div>
+
+    <!-- Round Left Arrow (back to Page 6). No right arrow: this is the last page. -->
+    <button
+      type="button"
+      id="prev-page-7"
+      class="page-nav-btn nav-prev"
+      aria-label="Previous page"
+      title="Previous page"
+    >
+      <svg viewBox="0 0 24 24" class="nav-chevron" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"></polyline>
+      </svg>
+    </button>
+  </section>
+
+  <!-- Floating Play/Pause Music Control (Fixed bottom-right, visible above all pages) -->
+  <button 
+    type="button" 
+    id="music-toggle" 
+    class="music-fab" 
+    aria-label="Pause background music" 
+    title="Pause music"
+  >
+    <span class="music-icon" aria-hidden="true">⏸</span>
+  </button>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
